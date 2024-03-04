@@ -16,10 +16,11 @@ services:
   nginx:
     build:
       context: .
-      dockerfile: ./nginx/Dockerfile
+
     volumes:
-    # Mountlocal 'app' directory to the Nginx root
-      - ./app:/var/www/html 
+      - ./app:/usr/share/nginx/html
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+     
     ports:
       - "8080:80"
     depends_on:
