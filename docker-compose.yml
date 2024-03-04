@@ -6,26 +6,21 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-    # Mounts the local 'app' directory to the container's Nginx root
-      - ./app:/var/www/html  
+      - ./app:/var/www/html
     depends_on:
-    # Depends on the MySQL database service
-      - mysql-db  
+      - mysql-db
 
   # NGINX Service
   nginx:
     build:
       context: .
-
     volumes:
       - ./app:/usr/share/nginx/html
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-     
     ports:
       - "8080:80"
     depends_on:
-      - php-fpm  # Depends on the PHP-FPM service
-      - mysql-db  # Depends on the MySQL database service
+      - php-fpm
+      - mysql-db
 
   # MySQL Database Service
   mysql-db:
@@ -35,15 +30,12 @@ services:
       MYSQL_DATABASE: test_database
       MYSQL_USER: db_user
       MYSQL_PASSWORD: password
-     
 
   # PHPMyAdmin Service
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     links:
-    # Links the PHPMyAdmin service to the MySQL database service
-      - mysql-db 
+      - mysql-db
     environment:
       PMA_HOST: mysql-db
-      # Use MySQL root password for PHPMyAdmin
-      MYSQL_ROOT_PASSWORD: password 
+      MYSQL_ROOT_PASSWORD: password
