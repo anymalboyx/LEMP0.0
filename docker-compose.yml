@@ -46,4 +46,3 @@ services:
       PMA_HOST: mysql-db
       # Use MySQL root password for PHPMyAdmin
       MYSQL_ROOT_PASSWORD: password 
-
