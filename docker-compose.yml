@@ -3,7 +3,7 @@ services:
   # PHP-FPM Service
   php-fpm:
     build:
-      context: .
+      context: ./php-fpm
       dockerfile: Dockerfile
     volumes:
       - ./app:/var/www/html
@@ -13,11 +13,12 @@ services:
   # NGINX Service
   nginx:
     build:
-      context: .
+      context: ./nginx
+      dockerfile: Dockerfile
     volumes:
       - ./app:/usr/share/nginx/html
     ports:
-      - "8080:80"
+      - "8088:80"
     depends_on:
       - php-fpm
       - mysql-db
