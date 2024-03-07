@@ -1,45 +1,44 @@
-version: '3.9'
+version: "2"
 services:
-  # PHP-FPM Service
-  php-fpm:
-    build:
-      context: ./php-fpm
-      dockerfile: Dockerfile
-    volumes:
-      - ./app:/var/www/html
-    depends_on:
-      - mysql-db 
-
-  # NGINX Service
   nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
+      # используем последний стабильный образ nginx
+        image: nginx:alpine
+        # маршрутизируем порты
+        ports:
+            - "8000:80"
+        # монтируем директории, слева директории на основной машине, справа - куда они монтируются в контейнере
+        volumes:
+            - ./images/nginx:/etc/nginx/conf.d
+            - ./www:/var/www
+            - ./logs:/var/log/nginx
+        # nginx должен общаться с php контейнером
+        links:
+            - php
+            - pma:phpmyadmin
+        
+  php:
+    build: ./images/php
+    # links:
+    #   - mysql
     volumes:
-      - ./app:/usr/share/nginx/html
+      - ./www:/var/www/
+
+  # mysql:
+  #   image: mysql:latest
+  #   ports:
+  #     - 33066:3306
+  #   volumes:
+  #     - ./mysql:/var/lib/mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: secret
+
+  pma:
+    image: phpmyadmin/phpmyadmin:latest
+    # image: phpmyadmin/phpmyadmin:latest
+    restart: always
     ports:
-      - "8088:80"
-    depends_on:
-      - php-fpm
-      - mysql-db
-
-  # MySQL Database Service
-  mysql-db:
-    image: mysql:8.0
+      - 8001:80
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: test_database
-      MYSQL_USER: db_user
-      MYSQL_PASSWORD: password
-
-  # PHPMyAdmin Service
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    
-    environment:
-      PMA_HOST: mysql-db
-      MYSQL_ROOT_PASSWORD: password
-      PMA_PORT: 8088
-    
-    depends_on:
-      - mysql-db
+      PMA_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: secret
