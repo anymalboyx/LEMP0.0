@@ -14,7 +14,9 @@ services:
         # nginx должен общаться с php контейнером
         links:
             - php
-            - pma:phpmyadmin
+            - pma
+        networks:
+            - internal
         
   php:
     build: ./images/php
@@ -41,3 +43,9 @@ services:
       PMA_HOST: mysql
       MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: secret
+    networks:
+      - internal
+
+  networks:
+  internal:
+    driver: bridge
