@@ -34,10 +34,9 @@ services:
 
   pma:
     image: phpmyadmin/phpmyadmin:latest
-    # image: phpmyadmin/phpmyadmin:latest
     restart: always
-    ports:
-      - 8001:80
+    # ports:
+    #   - 8001:80 #порт наружу должен быть закрыт
     environment:
       PMA_HOST: mysql
       MYSQL_USER: root
