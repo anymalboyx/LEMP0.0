@@ -1,51 +1,35 @@
-version: "2"
+version: "3.8"
 services:
   nginx:
-      # используем последний стабильный образ nginx
-        image: nginx:alpine
-        # маршрутизируем порты
-        ports:
-            - "8000:80"
-        # монтируем директории, слева директории на основной машине, справа - куда они монтируются в контейнере
-        volumes:
-            - ./images/nginx:/etc/nginx/conf.d
-            - ./www:/var/www
-            - ./logs:/var/log/nginx
-        # nginx должен общаться с php контейнером
-        links:
-            - php
-            - pma
-        networks:
-            - internal
-        
+    image: nginx:alpine
+    ports:
+      - 8000:80
+    volumes:
+      - ./images/nginx:/etc/nginx/conf.d
+      - ./www:/var/www
+      - ./logs:/var/log/nginx
+    links:
+      - php
+      - pma
+    networks:
+      - internal
   php:
     build: ./images/php
-    # links:
-    #   - mysql
     volumes:
       - ./www:/var/www/
-
-  # mysql:
-  #   image: mysql:latest
-  #   ports:
-  #     - 33066:3306
-  #   volumes:
-  #     - ./mysql:/var/lib/mysql
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: secret
-
+    networks:
+      - internal
   pma:
-    image: phpmyadmin/phpmyadmin:latest
+    # image: phpmyadmin:latest
+    image: traefik/whoami
     restart: always
-    # ports:
-    #   - 8001:80 #порт наружу должен быть закрыт
     environment:
       PMA_HOST: mysql
       MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: secret
+      PMA_ABSOLUTE_URI: http://localhost:8000/admin/
     networks:
       - internal
-
-  networks:
+networks:
   internal:
     driver: bridge
