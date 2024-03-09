@@ -13,12 +13,15 @@ services:
       - pma
     networks:
       - internal
+    
+
   php:
     build: ./images/php
     volumes:
       - ./www:/var/www/
     networks:
       - internal
+
   pma:
     # image: phpmyadmin:latest
     image: traefik/whoami
@@ -30,6 +33,26 @@ services:
       PMA_ABSOLUTE_URI: http://localhost:8000/admin/
     networks:
       - internal
+    ports:
+      - "3333:3306"  # порт для MySQL
+
+  mysql:
+    image: mysql:latest
+    restart: always
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: my_database
+      MYSQL_USER: my_user
+      MYSQL_PASSWORD: my_password
+    networks:
+      - internal
+    depends_on:
+      - pma
+
 networks:
   internal:
     driver: bridge
+    
+   
